@@ -81,6 +81,7 @@ func serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer c.Close()
+	log.Println("accept new ws connection")
 	mt, message, err := recvPacket(c)
 	if err != nil {
 		log.Println("invalid received packet:", err)
@@ -100,12 +101,15 @@ func serve(w http.ResponseWriter, r *http.Request) {
 		log.Println("client register with wrong secret key: refused")
 		return
 	}
+	log.Println("client " + regInfo.ClientName + " authentication passed")
 	err = sendRegisterAck(c)
 	if err != nil {
 		log.Println("error when sending register ack:", err)
 		return
 	}
+	log.Println("sent register ack to " + regInfo.ClientName)
 	curID := addClient(regInfo.ClientName, c)
+	log.Println("client ID:", curID)
 	for {
 		mt, message, err := recvPacket(c)
 		if mt < 0 {
@@ -126,6 +130,7 @@ func serve(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			continue
 		}
+		log.Println("receive message from " + regInfo.ClientName)
 		forwardMessage(curID, regInfo.ClientName, msgInfo.Content)
 	}
 	removeClient(curID)
