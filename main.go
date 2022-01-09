@@ -143,5 +143,9 @@ func main() {
 		return
 	}
 	http.HandleFunc(globalConfig.WSpath, serve)
-	log.Fatal(http.ListenAndServe(globalConfig.Host, nil))
+	if globalConfig.Wss != nil {
+		log.Fatal(http.ListenAndServeTLS(globalConfig.Host, globalConfig.Wss.Cert, globalConfig.Wss.Key, nil))
+	} else {
+		log.Fatal(http.ListenAndServe(globalConfig.Host, nil))
+	}
 }
