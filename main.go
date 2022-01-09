@@ -41,7 +41,7 @@ func removeClient(id int) {
 	lock.Unlock()
 }
 
-func forwardMessage(clientName string, content string) {
+func forwardMessage(clientID int, clientName string, content string) {
 	var forward forwardingMessage
 	forward.Construct(clientName, content)
 	msg, err := json.Marshal(forward)
@@ -52,6 +52,9 @@ func forwardMessage(clientName string, content string) {
 	lock.Lock()
 	defer lock.Unlock()
 	for i := 0; i < len(clients); i++ {
+		if i == clientID {
+			continue
+		}
 		if clients[i].Valid {
 			err := clients[i].Connection.WriteMessage(websocket.TextMessage, msg)
 			if err != nil {
@@ -123,7 +126,7 @@ func serve(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			continue
 		}
-		forwardMessage(regInfo.ClientName, msgInfo.Content)
+		forwardMessage(curID, regInfo.ClientName, msgInfo.Content)
 	}
 	removeClient(curID)
 }
