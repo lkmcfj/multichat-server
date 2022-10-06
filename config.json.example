@@ -1,0 +1,9 @@
+{
+    "ws-path": "/",
+    "host": "0.0.0.0:6780",
+    "secret-key": "password",
+    "wss": {
+        "keyfile": "/path/to/your/key",
+        "certfile": "/path/to/your/certificate"
+    }
+}
